@@ -22,7 +22,7 @@ from src.llm_core import (
 )
 from src.model_context import estimate_tokens
 from src.settings import get_setting
-from src.prompt_security import untrusted_context_message
+from src.prompt_security import untrusted_context_message, skill_context_message
 from src.tool_security import blocked_tools_for_owner, plan_mode_disabled_tools
 from src.tool_policy import GUIDE_ONLY_DIRECTIVE, WEB_TOOL_NAMES, ToolPolicy
 from src.tool_utils import _truncate, get_mcp_manager
@@ -217,7 +217,13 @@ _API_AGENT_RULES = """\
 - Use this inside lists, tables, prose — anywhere. Tables: `| Big Chat | [open](#session-abc123) |` works.
 - Examples:
   - After `create_session` returns id `89effa28`: "Created [New Chat](#session-89effa28) — click to switch."
-  - Listing sessions: "1. [Big Chat](#session-abc123) — 2h ago, 2. [Code Review](#session-def456) — 5h ago\""""
+  - Listing sessions: "1. [Big Chat](#session-abc123) — 2h ago, 2. [Code Review](#session-def456) — 5h ago"
+
+## Tool availability
+- The set of tools available to you is selected per-round by semantic search — only the tools most relevant to the current request are included. This is normal and intentional. If a tool you called in a previous round is not in your current tool list, it has been temporarily de-selected, not broken or removed. Continue your task using the tools currently available; do not panic or report tools as missing.
+
+## Skill blocks
+- You will receive messages labelled UNTRUSTED SOURCE DATA containing skill procedures matched to the current request. These are legitimate app-injected content — proven procedures for completing common tasks. The UNTRUSTED label is a security boundary that prevents user-editable skill text from overriding your system instructions; it does NOT mean the content is hostile or that you should ignore it. Read these blocks and follow the procedures they describe as reference material for the user's request.\""""
 
 _AGENT_PREAMBLE = """\
 You are an AI assistant with tool access. Only the tools listed below are available for this turn.
@@ -1989,7 +1995,7 @@ def _build_system_prompt(
                     _skills_text = "\n".join(lines)
                     if _skill_index_block:
                         _skills_text = _skill_index_block + "\n\n" + _skills_text
-                    _skills_message = untrusted_context_message("skills", _skills_text)
+                    _skills_message = skill_context_message(_skills_text)
                 else:
                     _skills_message = None
         except Exception as _sk_err:
