@@ -50,3 +50,10 @@ timetree*.png
 *_signin_page.png
 *_calendar_view.png
 .gitignore
+
+# Editor/deploy backups & scratch — keep out of build context
+*.bak
+*.bak.*
+*.pretgw.*
+_nightly_build.sh
+nightly-rebuild.sh

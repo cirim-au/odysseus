@@ -102,3 +102,10 @@ compound.config.json
 *.error.log
 _scratch/
 /odysseus/
+
+# Editor/deploy backups & scratch — never track (public fork)
+*.bak
+*.bak.*
+*.pretgw.*
+_nightly_build.sh
+nightly-rebuild.sh
