@@ -89,6 +89,10 @@ RUN pip install --no-cache-dir python-magic==0.4.27
 COPY --from=realesrgan-wheels /wheels/ /tmp/odysseus-wheels/
 RUN pip install --no-cache-dir --no-deps /tmp/odysseus-wheels/*.whl \
     && rm -rf /tmp/odysseus-wheels
+# Chat Gateway: WebSocket client for realtime platform adapters (Mattermost, etc.).
+# BSD-licensed, small; baked in so the gateway runs without INSTALL_OPTIONAL
+# (which would pull AGPL/heavy extras).
+RUN pip install --no-cache-dir websockets
 
 # Copy app code
 COPY . .
